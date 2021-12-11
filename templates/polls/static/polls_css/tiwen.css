@@ -1,0 +1,127 @@
+body{
+	width: 100%;
+	height: 100%;
+}
+li{list-style: none;}
+#tiwen_cannl{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	width: 100%;
+	height: 100%;
+}
+#cannll{
+	font-size: 20px;
+	width: 100px;
+}
+#cannll:hover{background-color: #7600b1;}
+#bigdiv{
+	width: 100%;
+	height: 100%;
+	min-height: 840px;
+	background-color: #3a00b8;
+}
+#topdiv{
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	background-color: #000084;
+}
+#title{
+	font-size: 80px;
+	color: white;
+	font-family: "宋体";
+	font-weight: 800;
+}
+#datadiv{
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+.data_div{
+	width: 297px;
+	height: 280px;
+	border: 3px solid black;
+	
+}
+.data_tubiao{
+	background-color: #a498a8;
+	width: 300px;
+	height: 168px;
+	z-index: 5;
+	/* border-bottom: 2px solid #a498a8; */
+}
+#data_infmation{
+	height: 40%;
+	width: 40%;
+	float: left;
+	display: flex;
+	flex-direction: column;
+	/* border: 1px solid black; */
+}
+#data_infmation>li{
+	font-size: 15px;
+	font-weight: 600;
+	font-family: "宋体";
+	color: black;
+	padding-left: 10px;
+	padding-top: 15px;
+}
+#tiwen_data{
+	height: 40%;
+	width: 60%;
+	float: left;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	padding-top: 20px;
+}
+#tiwen_data>li{
+	font-size: 25px;
+	font-family: "微软雅黑";
+	color: white;}
+#tiwen_data>span{
+	font-size: 20px;
+	font-weight: 500;
+	font-family: "宋体";
+	border-radius: 50%;
+	margin-top: 20px;
+}
+.tiwen_span2{
+	background-color: #00cf00;
+	z-index: 11;
+	display: none;
+}
+.tiwen_span1{
+	background-color: #55aaff;
+	z-index: 12;
+	display: none;
+}
+.tiwen_span3{
+	background-color: #d60000;
+	z-index: 10;
+	display: none;
+}
+#fangda_div{
+	width: 1400px;
+	height: 600px;
+	position: absolute;
+	background-color: #CCCCCC;
+	z-index: 25;
+	left: 65px;
+	top: 100px;
+	text-align: center;
+	display: none;
+}
+#fangda{
+	width: 100%;
+	height: 95%;
+	border-bottom: 1px solid black;
+}
+#fangda_candl{
+	width: 200px;
+}
+#fangda_candl:hover{background-color: #B721FF;}

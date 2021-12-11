@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/polls_css/login.css"/>
+    {% load static %}
+{#    <script src="{% static 'polls_js/login.js' %}"></script>#}
+    <script text="JavaScript" src="/static/polls_js/login.js"></script>
+
+</head>
+
+<body>
+		<div id="content">
+			<div id="box">
+				<div class="title">Login</div>
+				<div class="input">
+                    <form action="query" method="get">
+                        <input type="text" name="username" value="" placeholder="用户名" />
+					    <br>
+					    <input type="password" name="password" placeholder="密码" />
+
+                        <div class="left" >
+                            <button type="submit" name="submit1">登录</button>
+                        </div>
+                        <div class="right">
+                            <button type="reset" onclick="zhuche()">注册</button>
+                        </div>
+                    </form>
+				</div>
+			</div>
+		</div>
+
+</body>
+</html>

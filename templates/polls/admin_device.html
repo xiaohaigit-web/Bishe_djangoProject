@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>admin</title>
+        <script>
+            var ret={{ ret|safe }};
+            var patientid_list={{ patientid_list|safe }};
+            console.log(ret);
+            console.log(patientid_list);
+        </script>
+		{% load static %}
+         <script text="JavaScript" src="/static/polls_js/admin_device.js"></script>
+        <link rel="stylesheet" type="text/css" href="/static/polls_css/admin_device.css"/>
+	</head>
+	<body>
+		<div id="bind">
+			<li id="bind_li" >选择绑定病人</li>
+			<form action="bind/" id="bind_form" method="post">
+                {% csrf_token %}
+				<select id="bind_select" name="bind_select_">
+				  
+				</select>
+                <input type="text" id="bind_deviceid" class="send_data_text" name="deviceid">
+				<input type="button" class="bindb" name="" id="bind_candl" onclick="patient_bind_cannl()" value="退出" />
+				<input type="submit" class="bindb" name="" id="bind_patient" value="确认" />
+			</form>
+		</div>
+		<div id="unbind">
+			<li unbind_li >是否确认释放？</li>
+            <form action="release/" method="post">
+                {% csrf_token %}
+                <input type="text" id="unbind_patient_id" class="send_data_text" name="unbind_patient_name">
+                <input type="button" class="unbindb" name="" id="unbind_candl" onclick="unbind_cannl()" value="退出" />
+			    <input type="submit" class="unbindb" name="" id="unbind_patient" onclick="unbind_patient(this)" value="确认" />
+            </form>
+
+		</div>
+		<div id="delete_device">
+			<li>是否确认删除？</li>
+            <form action="de_device/" method="post">
+                {% csrf_token %}
+                <input type="text" id="de_device_id" class="send_data_text" name="de_device_name">
+                <input type="button" class="delete_devi" name="" id="delete_candl" onclick="delete_cannl()" value="退出" />
+			    <input type="submit" class="delete_devi" name="" id="delete_sure"  value="确认" />
+            </form>
+		</div>
+		<div id="body_div">
+			<div id="left_bigdiv">
+				<div id="left_topdiv">
+					<ul id="ul_1">
+						<li>
+							Management
+						</li>
+					</ul>
+				</div>
+				<div id="left_buttendiv">
+					<ul id="ul_2">
+						<li class="li_1" id="li_1-1">
+							<a class="a_1" id="a1" href="http://127.0.0.1:8000/polls/login/admin_patient/">病人管理</a>
+						</li>
+						
+						<li class="li_1" id="li_1-2">
+							<a class="a_1" id="a2" href="admin_device.html">设备管理</a>
+						</li>
+						<li class="li_1" id="li_1-3">
+							<a class="a_1" id="a3" href="http://127.0.0.1:8000/polls/login/tiwen/">体温监测</a>
+						</li>
+					</ul>
+				</div>
+			</div>	
+			<div id="right_bigdiv">
+				<div id="right_topdiv">
+					<span class="span1">tubiao</span>
+					<span class="span2">xiao hai</span>
+				</div>
+				<div id="right_meddiodiv">
+					<span id="span_patientlist">devices list</span>
+					<span id="add_patient">
+						<a href="http://127.0.0.1:8000/polls/login/add_device/" style="background-color: #d5e2d6">添加设备</a>
+					</span>
+				</div>
+				<div id="right_butten">
+					<li class="li_list">设备号</li>
+					<li class="li_list">病人ID</li>
+					<li class="li_list">分配日期</li>
+				</div>
+				<div id="data">
+					
+				</div>
+					
+				
+			</div>
+		</div>
+	</body>
+</html>
+

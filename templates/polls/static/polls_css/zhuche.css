@@ -1,0 +1,90 @@
+			#big{
+				margin: 150px auto;
+				width: 100%;
+				height: 460px;
+				border: 1px transparent solid;
+				background-color: #9afdcf;
+				background-image: linear-gradient(243deg, #6e9bfd 0%, #e0aeff 100%);
+				background-image: -webkit-linear-gradient(243deg, #21D4FD 0%, #f892ff 100%);
+				background-image: -moz-linear-gradient(243deg, #21D4FD 0%, #e594ff 100%);
+				background-image: -o-linear-gradient(243deg, #21D4FD 0%, #ffa2ff 100%);
+			}
+
+
+			#fom{
+				height: 150px;
+				width: 300px;
+				text-align: center;
+				/* border: 1px red solid; */
+				margin-top: 10px;
+				margin-left: 600px;
+				padding-top: 10px;
+				font-size: 25px;
+			}
+			#span1{
+				/* border: 1px black solid;
+				height: 100px;
+				width: 200px;
+				text-align: center;
+				padding: 5px;
+				margin-bottom: 50px; */
+				margin-top: 5px;
+				outline-style: none;
+				/* border: 1px solid #ccc; */
+				border-radius: 3px;
+				padding: 13px 14px;
+				width: 70%;
+				font-size: 22px;
+				font-weight: 700;
+				font-family: "Microsoft soft";
+			}
+			#span2{
+				margin-top: 5px;
+				outline-style: none;
+				/* border: 1px solid #ccc; */
+				border-radius: 3px;
+				padding: 13px 14px;
+				width: 70%;
+				font-size: 22px;
+				font-weight: 700;
+				font-family: "Microsoft soft";
+			}
+			#span4{
+				float: left;
+				margin-top: 0px;
+				margin-left: 45px;
+				outline-style: none;
+				/* border: 1px solid black; */
+				border-radius: 3px;
+				width: 70%;
+				font-size: 22px;
+				font-weight: 700;
+				font-family: "Microsoft soft";
+			}
+			button {
+				border: 1px solid red;
+				margin-top: 20px;
+				border: none;
+				color: #000;
+				padding: 5px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				border-radius: 15px;
+				background-color: #CCCCCC;
+			}
+			button:hover{
+				background-color: #B721FF;
+				color: #fff;
+		    }
+			#top{
+				height: 100px;
+				width: 200px;
+				/* border: 1px black solid; */
+				margin-left: 650px;
+				margin-top: 5px;
+				text-align: center;
+				padding: 5px;
+				font-size: 30px;
+			}
