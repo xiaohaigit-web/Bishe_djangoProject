@@ -131,7 +131,7 @@ li{
 	
 }
 
-input#text1{
+#text1,#text2,#text3,#text4,#text5{
 	width: 200px;
 	height: 40px;
 	margin: 5px;

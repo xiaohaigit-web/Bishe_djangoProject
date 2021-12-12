@@ -16,13 +16,13 @@
 			<div id="box">
 				<div class="title">Login</div>
 				<div class="input">
-                    <form action="query" method="get">
+                    <form action="query/" method="post" onsubmit="return login_submit(this)">
                         <input type="text" name="username" value="" placeholder="用户名" />
 					    <br>
 					    <input type="password" name="password" placeholder="密码" />
 
                         <div class="left" >
-                            <button type="submit" name="submit1">登录</button>
+                            <button type="submit" name="submit1" >登录</button>
                         </div>
                         <div class="right">
                             <button type="reset" onclick="zhuche()">注册</button>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>注册</title>
 	 <link rel="stylesheet" type="text/css" href="/static/polls_css/zhuche.css"/>
+    <script text="JavaScript" src="/static/polls_js/zhuche.js"></script>
 </head>
 <body>
 	<!--表单域，action用于将获取的到信息提交到后台地址-->
@@ -11,9 +12,9 @@
 		<div id="top">
 			<h3>账户注册</h3>
 		</div>
-		<form id="fom" action="save" method="get">
+		<form id="zhuche_form" action="save/" method="post" onsubmit=" return zhuche_submit_(this)">
 			<span id="span1">
-				用户:<input type="text" name="username">
+				用户名:<input type="text" name="username">
 			</span>
 			<br>
 			<span id="span2">
@@ -21,7 +22,7 @@
 			</span>
 			<br>
 			<span id="span3">
-				<button type="submit" id="msg_test" name="submit1" value="">注册</button>
+				<button type="submit" id="zhuche_submit" name="submit2" value="" >注册</button>
 			</span>
             <span id="span4">
                 <button type="button" onclick="window.location.href='http://127.0.0.1:8000/polls/login/'">返回登录</button>

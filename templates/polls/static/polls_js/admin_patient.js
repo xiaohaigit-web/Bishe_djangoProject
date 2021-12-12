@@ -10,12 +10,12 @@ function mycreat(){
 		var tbody = document.createElement("tbody");
 		//创建tr节点
 		var tr = document.createElement("li");
-		tr.id='data__tr';
+		tr.id='data__tr'+i.toString();
 		tr.className='data_tr';
 		tr.style.border='black'
 		//创建td节点
 		var td = document.createElement("li");
-		td.id='data__td';
+		td.id='data__td'+i.toString();
 		td.className='data_td';
 
 		var span1 = document.createElement("span");
@@ -50,6 +50,8 @@ function mycreat(){
 		span6.value='删除';
 		if (ret[i].bind_status===1){
 			span6.disabled=true;
+			span6.style.backgroundColor="#f0eded"
+
 		}
 		span6.onclick=function (){
 			delete_patient(this);
@@ -85,56 +87,109 @@ function bianji(item){
 function bianji_cannl(){
 	document.getElementById("bianji").style.display='none';
 }
-function checkbianji(form){
-	if (form.patient_id.value == '') {
+function checkbianji(){
+	edit_id=document.getElementById('edit_send').value
+	patient_id=document.getElementById('text_id').value
+    patient_name=document.getElementById('text_name').value
+	patient_gender=document.getElementById('text_gender').value
+	patient_birthday=document.getElementById('text_birthday').value
+	patient_physician=document.getElementById('text_physician').value
+    var flag = test();
+    if (flag === false) {
+         return;
+    }
+	$.ajax({
+          url: "/polls/login/admin_patient/edit/",
+          method: "POST",
+          data: {
+			  "edit_id":edit_id,
+			  "patient_id": patient_id,
+			  "patient_name": patient_name,
+			  "patient_gender": patient_gender,
+			  "patient_birthday": patient_birthday,
+			  "patient_physician": patient_physician,
+			  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+          },
+          success: function () {
+                alert('病人更新成功！')
+                $('input','#bianji_form_')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+				bianji_cannl();
+				location=location
+          },
+          error:function() {undefined
+                alert("病人ID已存在！");
+          }
+    })
+	function test(){
+		if (patient_id === '') {
 		alert("ID不能为空!");
-		form.patient_id.focus();
 		return false;
+		}
+		if (patient_name === '') {
+			alert("姓名不能为空!");
+			return false;
+		}
+		if (patient_gender === '') {
+			alert("性别不能为空!");
+			return false;
+		}
+		if (patient_birthday === '') {
+			alert("生日不能为空!");
+			return false;
+		}
+		if (patient_physician === '') {
+			alert("医生不能为空!");
+			return false;
+		}
+		return true;
 	}
-	if (form.patient_name.value == '') {
-		alert("姓名不能为空!");
-		form.patient_name.focus();
-		return false;
-	}
-	if (form.patient_gender.value == '') {
-		alert("性别不能为空!");
-		form.patient_gender.focus();
-		return false;
-	}
-	if (form.patient_birthday.value == '') {
-		alert("生日不能为空!");
-		form.patient_birthday.focus();
-		return false;
-	}
-	if (form.patient_physician.value == '') {
-		alert("医生不能为空!");
-		form.patient_physician.focus();
-		return false;
-	}
-	// document.getElementById('bianji_li').style.display='none';
-	alert("修改成功！")
-	return true;
 }
 function delete_patient(item){
 	document.getElementById("delete_patient").style.display='block';
 	var data=item.parentNode.firstChild.textContent
 	console.log(data);
 	document.getElementById('de_patient_id').value=data;
+	var data1=item.parentNode.parentNode.id
+	document.getElementById('de_patient_id').name=data1;
 
-
+}
+function de_patient(){
+	patient_id=document.getElementById('de_patient_id').value
+	de_tr_id=document.getElementById('de_patient_id').name
+	console.log();
+    var flag = test();
+    if (flag === false) {
+         return;
+    }
+	$.ajax({
+          url: "/polls/login/admin_patient/de_patient/",
+          method: "POST",
+          data: {
+			  "patient_id": patient_id,
+			  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+          },
+          success: function () {
+                alert(patient_id+'病人删除成功！')
+                $('input','#de_patient_form')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+				document.getElementById(de_tr_id).remove();
+				delete_cannl();
+          },
+          error:function() {undefined
+                alert(patient_id+"病人绑定中！");
+          }
+    })
+	function test(){
+		// if (patient_physician === '') {
+		// 	alert("医生不能为空!");
+		// 	return false;
+		// }
+		return true;
+		}
 }
 function delete_cannl(){
 	document.getElementById("delete_patient").style.display='none';
 }
-
-// var form = $('#bianji_form');
-// var options = {
-//          url: 'edit/',
-//          type: 'post',
-//          dataType: 'json',
-//          data: form.serialize(),
-//          success: function (data) {
-//                  alert('修改成功！')
-//           }
-// };
-// $.ajax(options);

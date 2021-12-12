@@ -8,13 +8,14 @@
             console.log(ret.length);
         </script>
         {% load static %}
+        <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
          <script text="JavaScript" src="/static/polls_js/admin_patient.js"></script>
         <link rel="stylesheet" type="text/css" href="/static/polls_css/admin_patient.css"/>
 	</head>
 	<body>
 		<div id="bianji">
 			<li id="bianji_li" >编辑病人</li>
-			<form action="edit/" id="bianji_form_" method="post" onsubmit="return checkbianji(this)" >
+			<form  id="bianji_form_" method="post"  >
                 {% csrf_token %}
 				<li class="inputadd">ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="patient_id" id="text_id" value ="" /></li>
 				<li class="inputadd">姓名：<input type="text" name="patient_name" id="text_name" value ="" /></li>
@@ -23,16 +24,16 @@
 				<li class="inputadd">医生：<input type="text" name="patient_physician" id="text_physician" value ="" /></li>
                 <li class="inputadd"><input type="text" class="send_data_text" name="edit_id" id="edit_send" value ="" /></li>
 				<input type="button" class="bianji" name="" id="bianji_candl" onclick="bianji_cannl()" value="退出" />
-				<input type="submit" class="bianji" name="" id="bianji_sure" value="确认" />
+				<input type="button" class="bianji" name="" id="bianji_sure" value="确认" onclick="checkbianji()" />
 			</form>
 		</div>
 		<div id="delete_patient">
 			<li>是否确认删除病人？</li>
-            <form action="de_patient/" method="post">
+            <form id="de_patient_form" method="post">
                 {% csrf_token %}
-                <input type="text" id="de_patient_id" class="send_data_text" name="de_patient_name">
+                <input type="text" id="de_patient_id" class="send_data_text" name="">
                 <input type="button" class="delete_pati" name="" id="delete_candl" onclick="delete_cannl()" value="退出" />
-                <input type="submit" class="delete_pati" name="" id="delete_sure" value="确认" />
+                <input type="button" class="delete_pati" name="" id="delete_sure" onclick="de_patient()" value="确认" />
             </form>
 		</div>
 		<div id="body_div">

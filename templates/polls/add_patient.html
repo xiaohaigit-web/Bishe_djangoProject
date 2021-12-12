@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>add_patient</title>
         {% load static %}
+        <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
         <script text="JavaScript" src="/static/polls_js/add_patient.js"></script>
         <link rel="stylesheet" type="text/css" href="/static/polls_css/add_patient.css"/>
 	</head>
@@ -41,15 +42,15 @@
 				</div>
 				<div id="data">
 					<ul id="add_patient_context">
-						<form action="addpatient" method="get" onsubmit="return save_patient(this)">
+						<form id="add_patient_form"  method="post">
 							<tr class="inputadd"><input type="text" name="patient_id" id="text1" value placeholder="ID：" /></tr>
-                            <tr class="inputadd"><input type="text" name="patient_name" id="text1" value placeholder="姓名：" /></tr>
-							<tr class="inputadd"><input type="text" name="patient_gender" id="text1" value placeholder="性别：" /></tr>
-							<tr class="inputadd"><input type="text" name="patient_birthday" id="text1" value placeholder="生日:" /></tr>
-                            <tr class="inputadd"><input type="text" name="patient_physician" id="text1" value placeholder="医生:" /></tr>
+                            <tr class="inputadd"><input type="text" name="patient_name" id="text2" value placeholder="姓名：" /></tr>
+							<tr class="inputadd"><input type="text" name="patient_gender" id="text3" value placeholder="性别：" /></tr>
+							<tr class="inputadd"><input type="text" name="patient_birthday" id="text4" value placeholder="生日:" /></tr>
+                            <tr class="inputadd"><input type="text" name="patient_physician" id="text5" value placeholder="医生:" /></tr>
 							<tr>
 								<td><input type="button" name="butten_addpatient" id="add_patient_butten1" onclick="cannl()" value="退出" /></td>
-								<td><input type="submit" name="submit_addpatient" id="add_patient_submit" value="保存" /></td>
+								<td><input type="button" name="submit_addpatient" id="add_patient_submit" onclick="save_patient()" value="保存" /></td>
 							</tr>
 						</form>
 					</ul>

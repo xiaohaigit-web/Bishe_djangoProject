@@ -1,7 +1,7 @@
 # Create your views here.
 import json
 import time
-
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.serializers import serialize
 from django.forms import model_to_dict
 from django.http import JsonResponse
@@ -24,9 +24,10 @@ def regiter(request):
 
 
 # 定义一个函数，用来保存注册的数据
+@ensure_csrf_cookie
 def save(request):
     has_regiter = 0  # 用来记录当前账号是否已存在，0：不存在 1：已存在
-    a = request.GET  # 获取get()请求
+    a = request.POST  # 获取get()请求
     # print("a:", a)
     # 通过get()请求获取前段提交的数据
     username = a.get('username')
@@ -39,13 +40,6 @@ def save(request):
         'ma': '返回登录',
         'md': '重新输入'
     }
-    # print(userName, passWord)
-    # print(type(username))
-    # print(type(password))
-    if username == "":
-        return render(request, 'polls/enter_name.html', {'save_message': save_message})
-    if password == "":
-        return render(request, 'polls/enter_password.html', {'save_message': save_message})
     # 连接数据库
     db = pymysql.connect(host='127.0.0.1',
                          port=3306,
@@ -55,51 +49,31 @@ def save(request):
                          )
     # 创建游标
     cursor = db.cursor()
-    # print("db:", db)
-    # SQL语句
-    # sql1 = 'select * from polls_user'
     sql1 = User.objects.all()
-    # 执行SQL语句
-    # cursor.execute(sql1)
-    # 查询到所有的数据存储到all_users中
-    # all_users = cursor.fetchall()
     all_users = sql1
-    # while i < len(all_users):
     for var in all_users:
         if username in var.username:
-            ##表示该账号已经存在
+            # 表示该账号已经存在
             has_regiter = 1
     if has_regiter == 0:
         add_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         # 将用户名与密码插入到数据库中
-        # sql2 = 'insert into user(username,password) values(%s,%s)'
         sql21 = User(username=username, password=password, add_time=add_time)
-        # cursor.execute(sql2, (userName, passWord))
         sql21.save()
         db.commit()
         cursor.close()
         db.close()
-
         return render(request, 'polls/zhuche_succssfuly.html', {'save_message': save_message})
     else:
-
-        cursor.close()
-        db.close()
         return render(request, 'polls/zhanghaohaved.html', {'save_message': save_message})
 
 
+@ensure_csrf_cookie
 def query(request):
-    a = request.GET
+    a = request.POST
     username = a.get('username')
     password = a.get('password')
     user_tup = (username, password)
-    if username == "":
-        return HttpResponse("请输入用户名！")
-    if password == "":
-        return HttpResponse("请输入密码！")
-    # print("user_tup:", user_tup)
-    # print("user_tup[0]:", user_tup[0], type(user_tup[0]))
-    # print("user_tup[1]:", user_tup[1], type(user_tup[1]))
     db = pymysql.connect(host='127.0.0.1',
                          port=3306,
                          user='root',
@@ -114,16 +88,16 @@ def query(request):
     cursor.close()
     db.close()
     has_user = 0
-    # while i < len(all_users):
     for var in all_users:
         print(var.username, type(var.username))
         print(var.password, type(var.password))
         if user_tup[0] == var.username and user_tup[1] == str(var.password):
             has_user = 1
     if has_user == 1:
-        return render(request, 'polls/admin_patient.html')
+        # return render(request, 'polls/admin_patient.html')
+        return redirect('admin_patient')
     else:
-        return HttpResponse('用户名或密码有误')
+        return HttpResponse(status=400)
 
 
 def admin_device(request):
@@ -201,20 +175,19 @@ def admin_patient(request):
         'ret': json_list,
     })
 
-
+# 添加病人页面
 def add_patient(request):
     return render(request, 'polls/add_patient.html')
-
 
 def add_device(request):
     return render(request, 'polls/add_device.html')
 
-
+@ensure_csrf_cookie
 def adddevice(request):
     has_id = 0
     add_request = request.POST
     deviceid = add_request.get('deviceid')
-    print('deviceid:',deviceid)
+    print('deviceid:', deviceid)
     db = pymysql.connect(host='127.0.0.1',
                          port=3306,
                          user='root',
@@ -239,20 +212,21 @@ def adddevice(request):
         db.commit()
         cursor.close()
         db.close()
-        return HttpResponse("设备添加成功")
+        return HttpResponse(status=200)
     else:
-        return HttpResponse("设备已存在！")
+        return HttpResponse(status=403)
 
 
+@ensure_csrf_cookie
 def addpatient(request):
     has_id = 0
-    add_request = request.GET
+    add_request = request.POST
     patient_id = add_request.get('patient_id')
     patient_name = add_request.get('patient_name')
     patient_gender = add_request.get('patient_gender')
     patient_birthday = add_request.get('patient_birthday')
     patient_physician = add_request.get('patient_physician')
-
+    print(patient_id,patient_name,patient_gender)
     db = pymysql.connect(host='127.0.0.1',
                          port=3306,
                          user='root',
@@ -264,13 +238,11 @@ def addpatient(request):
     sql1 = Patient.objects.all()
     all_ids = sql1
     for var in all_ids:
-        if patient_id in var.patient_id:
-            ##表示该id已经存在
+        if patient_id == var.patient_id:
+            # 表示该id已经存在
             has_id = 1
     if has_id == 0:
         add_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        # 将用户名与密码插入到数据库中
-        # sql2 = 'insert into user(username,password) values(%s,%s)'
         sql21 = Patient(
             patient_id=patient_id,
             patient_name=patient_name,
@@ -279,7 +251,6 @@ def addpatient(request):
             patient_physician=patient_physician,
             add_time=add_time,
         )
-        # cursor.execute(sql2, (userName, passWord))
         sql21.save()
         db.commit()
         cursor.close()
@@ -288,7 +259,7 @@ def addpatient(request):
     else:
         return HttpResponse("id已存在")
 
-
+@ensure_csrf_cookie
 def edit(request):
     a = request.POST  # 获取post()请求
     edit_id = a.get('edit_id')
@@ -297,6 +268,8 @@ def edit(request):
     patient_gender = a.get('patient_gender')
     patient_birthday = a.get('patient_birthday')
     patient_physician = a.get('patient_physician')
+    print(edit_id)
+    print(patient_id,patient_name,patient_gender,patient_birthday,patient_physician)
     has_patient_id = 0
     haved_id = Patient.objects.all()
     for i in haved_id:
@@ -314,16 +287,16 @@ def edit(request):
         edit_patient.save()
         return redirect('admin_patient')
     else:
-        return HttpResponse("patient_id haved!")
+        return HttpResponse(status=403)
 
-
+@ensure_csrf_cookie
 def bind(request):
     has_id = 0
     a = request.POST  # 获取post()请求
     # print("a:", a)
     # 通过get()请求获取前段提交的数据
-    patient_id = a.get('bind_select_')
-    deviceid = a.get('deviceid')
+    patient_id = a.get('patient_id')
+    deviceid = a.get('bind_device')
     print(patient_id)
     print(deviceid)
     # 连接数据库
@@ -338,7 +311,7 @@ def bind(request):
     sql1 = Patient.objects.all()
     all_users = sql1
     for var in all_users:
-        if patient_id in var.patient_id:
+        if patient_id == var.patient_id:
             has_id = 1
     if has_id == 1:
         bind_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -352,26 +325,27 @@ def bind(request):
     else:
         return HttpResponse(403)
 
-
+@ensure_csrf_cookie
 def release(request):
     a = request.POST  # 获取post()请求
-    deviceid = a.get('unbind_patient_name')
+    deviceid = a.get('patient_id')
     device_re = Patient_Device.objects.get(deviceid=deviceid)
     device_re.delete()
     return redirect('admin_device')
 
-
+@ensure_csrf_cookie
 def de_device(request):
     a = request.POST  # 获取post()请求
-    deviceid = a.get('de_device_name')
+    deviceid = a.get('deviceid')
     device_de = Device.objects.get(deviceid=deviceid)
     device_de.delete()
-    return redirect('admin_device')
+    return HttpResponse(status=200)
 
-
+@ensure_csrf_cookie
 def de_patient(request):
     a = request.POST  # 获取post()请求
-    patient_id = a.get('de_patient_name')
+    patient_id = a.get('patient_id')
+    print(patient_id)
     patient_de = Patient.objects.get(patient_id=patient_id)
     patient_de.delete()
     return redirect('admin_patient')

@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>add_device</title>
         {% load static %}
+        <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
         <script text="JavaScript" src="/static/polls_js/add_device.js"></script>
         <link rel="stylesheet" type="text/css" href="/static/polls_css/add_device.css"/>
 	</head>
@@ -41,12 +42,12 @@
 				</div>
 				<div id="data">
 					<ul id="add_patient_context">
-						<form action="adddevice/" method="post" onsubmit="return save_device(this)">
+						<form id="add_device_form" method="post" >
                             {% csrf_token %}
 							<tr class="inputadd"><input type="text" name="deviceid" id="_device_text"  placeholder="设备号：" /></tr>
 							<tr>
 								<td><input type="button" name="butten_" id="_butten1" onclick="cannl()" value="退出" /></td>
-								<td><input type="submit" name="submit_" id="_submit"   value="保存" /></td>
+								<td><input type="button" name="submit_" id="_submit"   value="保存" onclick="save_device()"/></td>
 							</tr>
 						</form>
 					</ul>

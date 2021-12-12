@@ -11,7 +11,7 @@
 			}
 
 
-			#fom{
+			#zhuche_form{
 				height: 150px;
 				width: 300px;
 				text-align: center;
@@ -45,6 +45,7 @@
 				border-radius: 3px;
 				padding: 13px 14px;
 				width: 70%;
+				margin-left: 20px;
 				font-size: 22px;
 				font-weight: 700;
 				font-family: "Microsoft soft";

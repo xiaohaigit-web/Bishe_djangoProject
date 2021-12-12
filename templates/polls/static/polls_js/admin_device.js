@@ -7,12 +7,12 @@ function mycreat(){
 		var tbody = document.createElement("tbody");
 		//创建tr节点
 		var tr = document.createElement("li");
-		tr.id='data__tr';
+		tr.id='data__tr'+i.toString();
 		tr.className='data_tr';
 		tr.style.border='black'
 		//创建td节点
 		var td = document.createElement("li");
-		td.id='data__td';
+		td.id='data__td'+i.toString();
 		td.className='data_td';
 		  
 		var span1 = document.createElement("span");
@@ -33,6 +33,7 @@ function mycreat(){
 		span4.value='释放';
 		if (ret[i].patient_id==='--'){
 			span4.disabled=true;
+			span4.style.backgroundColor="#f0eded"
 		}
 		span4.onclick=function(){
 			unbind(this);
@@ -44,6 +45,7 @@ function mycreat(){
 		span5.value='绑定';
 		if (ret[i].patient_id!=='--'){
 			span5.disabled=true;
+			span5.style.backgroundColor="#f0eded"
 		}
 		span5.onclick=function(){
 			patient_bind(this);
@@ -55,6 +57,7 @@ function mycreat(){
 		span6.value='删除设备';
 		if (ret[i].patient_id!=='--'){
 			span6.disabled=true;
+			span6.style.backgroundColor="#f0eded"
 		}
 		span6.onclick=function(){
 			delete_device(this);
@@ -80,15 +83,72 @@ function unbind(item){
 function unbind_cannl(){
 	document.getElementById('unbind').style.display='none';
 }
-function unbind_patient(item){
-}
-function remove_(){
-	var flag=confirm('确认删除？');
-	if(flag){
-		document.getElementById('data_span4').remove();
+function unbind_butten(){
+	patient_id=document.getElementById('unbind_patient_id').value
+	console.log(patient_id);
+    var flag = test();
+    if (flag === false) {
+         return;
+    }
+	$.ajax({
+          url: "/polls/login/admin_device/release/",
+          method: "POST",
+          data: {
+			  "patient_id": patient_id,
+			  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+          },
+          success: function () {
+                alert('病人解绑成功！')
+                $('input','#unbind_form')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+				unbind_cannl();
+				location=location
+          },
+          error:function() {undefined
+                alert("病人解绑错误！");
+          }
+    })
+	function test(){
+		return true;
 	}
 }
-
+function de_device_butten(item){
+	deviceid=document.getElementById('de_device_id').value
+	de_tr_id=document.getElementById('de_device_id').name
+	console.log(de_tr_id);
+    var flag = test();
+    if (flag === false) {
+         return;
+    }
+	$.ajax({
+          url: "/polls/login/admin_device/de_device/",
+          method: "POST",
+          data: {
+			  "deviceid": deviceid,
+			  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+          },
+          success: function () {
+                alert(deviceid+'设备删除成功！')
+			    // var flagg=confirm('病人删除成功！');
+				// if(flagg){
+				// 	document.getElementById(de_tr_id).remove();
+				// }
+                $('input','#de_device_form')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+				document.getElementById(de_tr_id).remove();
+				delete_cannl();
+				// location=location
+          },
+          error:function() {undefined
+                alert(deviceid+"设备删除错误！");
+          }
+    })
+	function test(){
+		return true;
+	}
+}
 function patient_bind(item){
 	document.getElementById('bind').style.display='block';
 	for(i=0;i<patientid_list.length;i++){
@@ -102,15 +162,50 @@ function patient_bind(item){
 	console.log(data);
 	document.getElementById('bind_deviceid').value=data;
 }
+function bind_butten(){
+	patient_id=document.getElementById('bind_select').value
+	bind_deviice=document.getElementById('bind_deviceid').value
+	console.log(patient_id);
+    var flag = test();
+    if (flag === false) {
+         return;
+    }
+	$.ajax({
+          url: "/polls/login/admin_device/bind/",
+          method: "POST",
+          data: {
+			  "patient_id": patient_id,
+			  "bind_device":bind_deviice,
+			  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+          },
+          success: function () {
+                alert('病人绑定成功！')
+                $('input','#bind_form')
+                    .not(':button, :submit, :reset, :hidden')
+                    .val('');
+				patient_bind_cannl();
+				location=location
+          },
+          error:function() {undefined
+                alert("病人绑定错误！");
+          }
+    })
+	function test(){
+		return true;
+	}
+}
 function patient_bind_cannl(){
 	document.getElementById('bind').style.display='none';
 	window.location.reload()
 }
 function delete_device(item){
 	document.getElementById('delete_device').style.display='block';
+	var data1=item.parentNode.parentNode.id
 	var data=item.parentNode.firstChild.textContent
 	console.log(data);
+	console.log(data1)
 	document.getElementById('de_device_id').value=data;
+	document.getElementById('de_device_id').name=data1;
 }
 function delete_cannl(){
 	document.getElementById('delete_device').style.display='none';
