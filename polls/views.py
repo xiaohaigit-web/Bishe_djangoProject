@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.shortcuts import HttpResponse
 import pymysql
-from polls.models import User, Patient_Device, Patient, Device
+from polls.models import User, Patient_Device, Patient, Device, Row_Data
 from collections import Iterable
 
 
@@ -145,7 +145,44 @@ def admin_device(request):
 
 
 def tiwen(request):
-    return render(request, 'polls/tiwen.html')
+    all_data = []
+    patient_list = []
+    all_patient = Patient.objects.all()
+    for i in all_patient:
+        row = []
+        rtime = []
+        if i.have_data == 1:
+            data = Row_Data.objects.filter(patient_id__contains=i.patient_id)
+            all_data.append(data)
+            for j in data:
+                row.append(float(j.row))
+                timeArray = time.localtime(j.recordTime)
+                otherStyleTime = time.strftime("%Y-%m-%d %H:%M", timeArray)
+                rtime.append(otherStyleTime)
+        if len(row) > 144:
+            row = row[len(row) - 144:]
+            rtime = rtime[len(rtime) - 144:]
+        print('row:', len(row))
+        print('rtime:', len(rtime))
+        # print('row: ', row)
+        # print('tiem: ', rtime)
+        patient_dirt = {
+            "patient_id": i.patient_id,
+            "patient_name": i.patient_name,
+            "patient_gender": i.patient_gender,
+            "patient_birthday": i.patient_birthday,
+            "patient_physician": i.patient_physician,
+            "patient_row_data": row,
+            "patient_row_time": rtime
+        }
+        patient_list.append(patient_dirt)
+    print(len(patient_list))
+    # for i in  patient_list:
+    #     print(i)
+
+    return render(request, 'polls/tiwen.html', {
+        'patient_list': patient_list,
+    })
 
 
 def admin_patient(request):
@@ -175,12 +212,15 @@ def admin_patient(request):
         'ret': json_list,
     })
 
+
 # 添加病人页面
 def add_patient(request):
     return render(request, 'polls/add_patient.html')
 
+
 def add_device(request):
     return render(request, 'polls/add_device.html')
+
 
 @ensure_csrf_cookie
 def adddevice(request):
@@ -226,15 +266,8 @@ def addpatient(request):
     patient_gender = add_request.get('patient_gender')
     patient_birthday = add_request.get('patient_birthday')
     patient_physician = add_request.get('patient_physician')
-    print(patient_id,patient_name,patient_gender)
-    db = pymysql.connect(host='127.0.0.1',
-                         port=3306,
-                         user='root',
-                         password='210014',
-                         db='django'
-                         )
-    # 创建游标
-    cursor = db.cursor()
+    print(patient_id, patient_name, patient_gender)
+
     sql1 = Patient.objects.all()
     all_ids = sql1
     for var in all_ids:
@@ -242,6 +275,14 @@ def addpatient(request):
             # 表示该id已经存在
             has_id = 1
     if has_id == 0:
+        db = pymysql.connect(host='127.0.0.1',
+                             port=3306,
+                             user='root',
+                             password='210014',
+                             db='django'
+                             )
+        # 创建游标
+        cursor = db.cursor()
         add_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         sql21 = Patient(
             patient_id=patient_id,
@@ -259,6 +300,7 @@ def addpatient(request):
     else:
         return HttpResponse("id已存在")
 
+
 @ensure_csrf_cookie
 def edit(request):
     a = request.POST  # 获取post()请求
@@ -269,7 +311,7 @@ def edit(request):
     patient_birthday = a.get('patient_birthday')
     patient_physician = a.get('patient_physician')
     print(edit_id)
-    print(patient_id,patient_name,patient_gender,patient_birthday,patient_physician)
+    print(patient_id, patient_name, patient_gender, patient_birthday, patient_physician)
     has_patient_id = 0
     haved_id = Patient.objects.all()
     for i in haved_id:
@@ -288,6 +330,7 @@ def edit(request):
         return redirect('admin_patient')
     else:
         return HttpResponse(status=403)
+
 
 @ensure_csrf_cookie
 def bind(request):
@@ -325,6 +368,7 @@ def bind(request):
     else:
         return HttpResponse(403)
 
+
 @ensure_csrf_cookie
 def release(request):
     a = request.POST  # 获取post()请求
@@ -332,6 +376,7 @@ def release(request):
     device_re = Patient_Device.objects.get(deviceid=deviceid)
     device_re.delete()
     return redirect('admin_device')
+
 
 @ensure_csrf_cookie
 def de_device(request):
@@ -341,6 +386,7 @@ def de_device(request):
     device_de.delete()
     return HttpResponse(status=200)
 
+
 @ensure_csrf_cookie
 def de_patient(request):
     a = request.POST  # 获取post()请求
@@ -349,3 +395,41 @@ def de_patient(request):
     patient_de = Patient.objects.get(patient_id=patient_id)
     patient_de.delete()
     return redirect('admin_patient')
+
+
+def save_row_data(request):
+    add_request = request.POST
+    patient_id = add_request.get('patient_id')
+    row = add_request.get('row')
+    recordtime = add_request.get('recordTime')
+    print(patient_id, row, recordtime)
+    has = 0
+    haved_recordtime = Row_Data.objects.filter(patient_id__contains=patient_id)
+    for i in haved_recordtime:
+        if recordtime == i.recordTime:
+            has = 1
+    if has == 0:
+        db = pymysql.connect(host='127.0.0.1',
+                             port=3306,
+                             user='root',
+                             password='210014',
+                             db='django'
+                             )
+        # 创建游标
+        cursor = db.cursor()
+        add_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        sql21 = Row_Data(
+            patient_id=patient_id,
+            row=row,
+            recordTime=recordtime,
+        )
+        patient = Patient.objects.get(patient_id=patient_id)
+        patient.have_data = 1
+        patient.save()
+        sql21.save()
+        db.commit()
+        cursor.close()
+        db.close()
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse('the patient recordtime haved!')

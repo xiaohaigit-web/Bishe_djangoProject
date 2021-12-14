@@ -21,6 +21,7 @@ urlpatterns = [
     path('login/admin_device/de_device/', views.de_device, name='de_device'),
     path('login/admin_patient/de_patient/', views.de_patient, name='de_patient'),
     path('login/admin_patient/edit/', views.edit, name='edit_patient'),
+    path('send_data/', views.save_row_data,name='save_rowdata'),
 
     # re_path(r'^login/', views.login, name="login"),
     # re_path(r'^login/regiter/', views.regiter, name="regiter"),

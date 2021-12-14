@@ -7,6 +7,14 @@
          <script text="JavaScript" src="/static/polls_js/echarts.js"></script>
         <script text="JavaScript" src="/static/polls_js/tiwen.js"></script>
         <link rel="stylesheet" type="text/css" href="/static/polls_css/tiwen.css"/>
+        <script>
+             var patient_list={{ patient_list|safe }}
+             console.log(patient_list);
+             for (i in patient_list){
+                 print(i)
+             }
+        </script>
+        <meta http-equiv="refresh" content="16">
 	</head>
 	<body>
 		<div id="fangda_div">
