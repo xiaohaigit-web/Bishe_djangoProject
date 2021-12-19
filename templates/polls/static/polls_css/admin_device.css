@@ -12,7 +12,7 @@ a{text-decoration:none}
 }
 #left_bigdiv{
 	width: 280px;
-	min-height: 770px; 
+	min-height: 600px;
 	margin: 0;
 	/* padding-top:20px; */
 	background-color: #0F4DA8;
@@ -21,7 +21,7 @@ a{text-decoration:none}
 }
 #right_bigdiv{
 	height: 100%;
-	min-height: 770px; 
+	min-height: 600px;
 	width: 100%;
 	background-color: #21D4FD;
 	/* left: 351px; */
@@ -176,7 +176,7 @@ li{
 #data{
 	width: 97.55%;
 	/* height: 79.5%; */
-	min-height: 770px;
+	min-height: 600px;
 	max-height: 79.5%;
 	/* min-height: 900px; */
 	/* border: 1px solid black; */
@@ -282,3 +282,12 @@ li{
 .send_data_text{
 	display: none;
 }
+.cav_li{
+	text-align: center;
+	background-color: #ac9f9f;
+	width: 70px;
+	margin-bottom: 5px;
+	margin-left: 10px;
+
+}
+.cav_li:hover{background-color: #7600b1}

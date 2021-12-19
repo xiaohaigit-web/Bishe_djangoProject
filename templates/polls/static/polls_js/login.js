@@ -1,7 +1,5 @@
 function zhuche() {
     window.location.href="regiter";
-    // alert('hhh')
-
 }
 function login_submit(form){
     if (form.username.value === '') {

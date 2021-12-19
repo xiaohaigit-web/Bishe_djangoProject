@@ -10,6 +10,9 @@ from django.shortcuts import HttpResponse
 import pymysql
 from polls.models import User, Patient_Device, Patient, Device, Row_Data
 from collections import Iterable
+from django.contrib.auth.decorators import login_required
+from lib.mypage import Pagination
+from django.db.models import Max
 
 
 # 登录页面
@@ -106,6 +109,15 @@ def admin_device(request):
     device_all = Device.objects.all()
     device_list = []
     patientid_list = []
+
+    paginator = Paginator(device_all, 10)
+    try:
+        page_number = request.GET.get('page', '1')
+        page = paginator.page(page_number)
+    except (PageNotAnInteger, EmptyPage, InvalidPage):
+        # 如果出现上述异常，默认展示第1页
+        page = paginator.page(1)
+
     for i in patientid_all:
         has_bind = 0
         for jj in patient_device_all:
@@ -117,7 +129,7 @@ def admin_device(request):
             }
             patientid_list.append(json_dirt)
 
-    for i in device_all:
+    for i in page.object_list:
         has_bind = 0
         n_j = 0  # 记录j
         for j in patient_device_all:
@@ -140,11 +152,14 @@ def admin_device(request):
             device_list.append(json_dict)
     # print(device_list)
     return render(request, 'polls/admin_device.html', {'ret': device_list,
+                                                       'page': page,
                                                        'patientid_list': patientid_list,
                                                        })
 
 
 def tiwen(request):
+    global device_status
+    global patient_device
     all_data = []
     patient_list = []
     all_patient = Patient.objects.all()
@@ -152,31 +167,38 @@ def tiwen(request):
         row = []
         rtime = []
         if i.have_data == 1:
-            data = Row_Data.objects.filter(patient_id__contains=i.patient_id)
+            device = Patient_Device.objects.get(patient_id=i.patient_id)
+            device_status = device.device_status
+            patient_device = device.deviceid
+            data = Row_Data.objects.filter(deviceid__contains=device.deviceid)
             all_data.append(data)
             for j in data:
                 row.append(float(j.row))
                 timeArray = time.localtime(j.recordTime)
                 otherStyleTime = time.strftime("%Y-%m-%d %H:%M", timeArray)
                 rtime.append(otherStyleTime)
+        else:
+            device_status = 2
+            # patient_device = '无设备'
         if len(row) > 144:
             row = row[len(row) - 144:]
             rtime = rtime[len(rtime) - 144:]
-        print('row:', len(row))
-        print('rtime:', len(rtime))
-        # print('row: ', row)
-        # print('tiem: ', rtime)
+        # print('row:', len(row), i.patient_id)
+        # print('rtime:', len(rtime))
         patient_dirt = {
             "patient_id": i.patient_id,
             "patient_name": i.patient_name,
             "patient_gender": i.patient_gender,
             "patient_birthday": i.patient_birthday,
             "patient_physician": i.patient_physician,
+            "device_status": device_status,
+            "patient_device": patient_device,
             "patient_row_data": row,
             "patient_row_time": rtime
         }
         patient_list.append(patient_dirt)
-    print(len(patient_list))
+
+    # print(len(patient_list))
     # for i in  patient_list:
     #     print(i)
 
@@ -186,13 +208,27 @@ def tiwen(request):
 
 
 def admin_patient(request):
-    ret = Patient.objects.all()
     patient_device = Patient_Device.objects.all()
-    # ret = serialize("json", ret)
-    patient_device_list = []
     json_list = []
-    for i in ret:
-        print(i)
+    # 1. 把需要分页的数据全部查询出来；
+    user_list = Patient.objects.all()
+    # 2. 利用user_list数据，创建一个分页器对象
+    # 参数1：要分页的数据；参数2：设置每页要展示的数据个数；参数3：如果最后一页不到5个数据，是否将最后一页的数据合并到上一页进行展示；默认是False，不合并；
+    paginator = Paginator(user_list, 10)
+    # 3. 创建页面对象Page，每一个page对应的是每一个页面，这个page中包含：
+    # page对象有三个属性：
+    # a> page.number: 表示当前查询的页码；
+    # b> page.object_list: 表示当前页要展示的数据；
+    # c> page.paginator: 它就是上面创建的Paginator(user_list, 5)这个对象，无论是哪一页，这个paginator对象始终跟着Page对象；
+    try:
+        page_number = request.GET.get('page', '1')
+        page = paginator.page(page_number)
+    except (PageNotAnInteger, EmptyPage, InvalidPage):
+        # 如果出现上述异常，默认展示第1页
+        page = paginator.page(1)
+    print(type(page.object_list))
+    print(page)
+    for i in page.object_list:
         json_dict = {
             "patient_id": i.patient_id,
             "patient_name": i.patient_name,
@@ -205,10 +241,8 @@ def admin_patient(request):
                 json_dict['bind_status'] = 1
         json_list.append(json_dict)
 
-    # for i in json_list:
-    #     print(i['patient_id'])
-    # print(isinstance(json_list, Iterable))
     return render(request, 'polls/admin_patient.html', {
+        'page': page,
         'ret': json_list,
     })
 
@@ -399,12 +433,16 @@ def de_patient(request):
 
 def save_row_data(request):
     add_request = request.POST
-    patient_id = add_request.get('patient_id')
+    deviceid = add_request.get('deviceid')
     row = add_request.get('row')
     recordtime = add_request.get('recordTime')
-    print(patient_id, row, recordtime)
+    count = 0  # device_status判断
+    print(deviceid, row, recordtime)
+
+    obj = Patient_Device.objects.get(deviceid=deviceid)
+    patient = Patient.objects.get(patient_id=obj.patient_id)
     has = 0
-    haved_recordtime = Row_Data.objects.filter(patient_id__contains=patient_id)
+    haved_recordtime = Row_Data.objects.filter(deviceid__contains=deviceid)
     for i in haved_recordtime:
         if recordtime == i.recordTime:
             has = 1
@@ -417,13 +455,13 @@ def save_row_data(request):
                              )
         # 创建游标
         cursor = db.cursor()
-        add_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        reversetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         sql21 = Row_Data(
-            patient_id=patient_id,
+            deviceid=deviceid,
             row=row,
             recordTime=recordtime,
+            reverseTime=reversetime
         )
-        patient = Patient.objects.get(patient_id=patient_id)
         patient.have_data = 1
         patient.save()
         sql21.save()
@@ -433,3 +471,82 @@ def save_row_data(request):
         return HttpResponse(status=200)
     else:
         return HttpResponse('the patient recordtime haved!')
+
+
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
+
+
+def select(request):
+    # 1. 把需要分页的数据全部查询出来；
+    user_list = Patient.objects.all()
+    # 2. 利用user_list数据，创建一个分页器对象
+    # 参数1：要分页的数据；参数2：设置每页要展示的数据个数；参数3：如果最后一页不到5个数据，是否将最后一页的数据合并到上一页进行展示；默认是False，不合并；
+    paginator = Paginator(user_list, 4)
+    # 3. 创建页面对象Page，每一个page对应的是每一个页面，这个page中包含：
+    # page对象有三个属性：
+    # a> page.number: 表示当前查询的页码；
+    # b> page.object_list: 表示当前页要展示的数据；
+    # c> page.paginator: 它就是上面创建的Paginator(user_list, 5)这个对象，无论是哪一页，这个paginator对象始终跟着Page对象；
+    try:
+        page_number = request.GET.get('page', '1')
+        page = paginator.page(page_number)
+    except (PageNotAnInteger, EmptyPage, InvalidPage):
+        # 如果出现上述异常，默认展示第1页
+        page = paginator.page(1)
+    print(type(page))
+    return render(request, 'polls/admin_patient.html', {'page': page})
+
+
+def ajax_tiwen(request):
+    row_list = []
+    all_patient = Patient.objects.all()
+    for i in all_patient:
+        row = []
+        rtime = []
+        if i.have_data == 1:
+            data = Row_Data.objects.filter(patient_id__contains=i.patient_id)
+            for j in data:
+                row.append(float(j.row))
+                timeArray = time.localtime(j.recordTime)
+                otherStyleTime = time.strftime("%Y-%m-%d %H:%M", timeArray)
+                rtime.append(otherStyleTime)
+        # if len(row) > 144:
+        row = row[len(row) - 1:]
+        # print('row:', len(row))
+        # print('rtime:', len(rtime))
+        # print('row: ', row)
+        # print('tiem: ', rtime)
+        if len(row) != 0:
+            row_list.append(row[0])
+        else:
+            row_list.append('')
+    # print(len(patient_list))
+    # for i in patient_list:
+    #     print(i)
+    print(type(row_list))
+    print(row_list)
+    return HttpResponse(row_list)
+
+
+def device_status(request):
+    all_patient = Patient.objects.all()
+    for i in all_patient:
+        if i.have_data == 1:
+            device = Patient_Device.objects.get(patient_id=i.patient_id)
+            lastdata = Row_Data.objects.filter(deviceid__contains=device.deviceid).last()
+            lastdata = lastdata.reverseTime
+            timeArray = time.strptime(lastdata, "%Y-%m-%d %H:%M:%S")
+            # 转换为时间戳:
+            last_reversetime = int(time.mktime(timeArray))
+            # print('last_reversetime:', last_reversetime, type(last_reversetime))
+            nowtime = int(time.time())
+            # print('nowtime:', nowtime, type(nowtime))
+            old_status = Patient_Device.objects.get(patient_id=i.patient_id)
+            if nowtime - last_reversetime < 120:
+                old_status.device_status = 1
+                old_status.save()
+            else:
+                old_status.device_status = 0
+                old_status.save()
+            print(i.patient_id, old_status.device_status)
+    return HttpResponse(status=200)

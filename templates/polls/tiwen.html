@@ -4,17 +4,18 @@
 		<meta charset="utf-8">
 		<title>体温检测</title>
         {% load static %}
+        <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
          <script text="JavaScript" src="/static/polls_js/echarts.js"></script>
         <script text="JavaScript" src="/static/polls_js/tiwen.js"></script>
+
         <link rel="stylesheet" type="text/css" href="/static/polls_css/tiwen.css"/>
         <script>
              var patient_list={{ patient_list|safe }}
-             console.log(patient_list);
-             for (i in patient_list){
-                 print(i)
-             }
+             var row_list={{ row_list|safe }}
+             console.log(row_list);
+
         </script>
-        <meta http-equiv="refresh" content="16">
+{#        <meta http-equiv="refresh" content="16">#}
 	</head>
 	<body>
 		<div id="fangda_div">

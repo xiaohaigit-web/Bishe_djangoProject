@@ -5,6 +5,7 @@
 		<title>admin</title>
         <script>
             var ret={{ ret|safe }};
+            {#var page={{ page|safe }}#}
             var patientid_list={{ patientid_list|safe }};
             console.log(ret);
             console.log(patientid_list);
@@ -88,8 +89,39 @@
 				<div id="data">
 					
 				</div>
-					
-				
+					<nav aria-label="Page navigation">
+                <ul class="pagination" style="margin: 0px">
+                    {% if page.has_previous %}
+                        {#page.has_previous: 判断当前页page是否含有上一页的属性#}
+                        {#page.previous_page_number：上一页的页码#}
+                        <li class="cav_li" style="float: left;">
+                            <a href="?page={{ page.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true" >上一页</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {#每次点击页码，这20次循环都会从头开始循环。#}
+                    {% for page_number in page.paginator.page_range %}
+                        {% if page_number == page.number %}
+                            {#如果当前查询的页码和循环的页码刚好相等#}
+                            <li class="active" style="float: left;margin-left: 10px">
+                                <a href="?page={{ page_number }}" style="color: red">{{ page_number }}</a>
+                            </li>
+                        {% else %}
+                            <li style="float: left;margin-left: 10px">
+                                <a href="?page={{ page_number }}" style="color: black">{{ page_number }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page.has_next %}
+                        <li class="cav_li" style="float: left;">
+                            <a href="?page={{ page.next_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true" >下一页</span>
+                            </a>
+                        </li>
+                    {% endif %}
+              </ul>
+            </nav>
 			</div>
 		</div>
 	</body>

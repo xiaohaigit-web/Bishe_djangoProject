@@ -1,7 +1,10 @@
-row_list=[33.4,33.6,35.6,34,37,35,38,39,38,37,35,39,39.40,41,41,39,38,38,37,37,38,36,38,36,35,35]
-time_list=['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','24:00']
 function cannll () {
 	window.history.back(-1);
+}
+var flag=setInterval(time_out,122*1000);
+var flag_device_status=setInterval(device_status,121*1000)
+function time_out(){
+	location.reload();
 }
 window.onload=mycr;
 function mycr(){
@@ -31,21 +34,35 @@ function mycr(){
 		information_li2.innerHTML='姓名:'+patient_list[i].patient_name;
 		information_li5=document.createElement('li');
 		information_li5.innerHTML='性别:'+patient_list[i].patient_gender;
-		// information_li4=document.createElement('li');
-		// information_li4.innerHTML='设备号:'+patient_list[i].patient_device;
+
+		information_li4=document.createElement('li');
+		if (patient_list[i].device_status===2){
+			information_li4.style.color='rgb(143 69 224)';
+			information_li4.innerHTML='无设备';
+		}
+		if (patient_list[i].device_status===1){
+			information_li4.innerHTML=patient_list[i].patient_device+'：在线';
+		}
+		if(patient_list[i].device_status===0){
+			information_li4.style.color='rgb(210 59 115)';
+			information_li4.innerHTML=patient_list[i].patient_device+'：离线';
+		}
 		information_li3=document.createElement('li');
 		information_li3.innerHTML='医生:'+patient_list[i].patient_physician;
+
+
 		
 		data_infmation.appendChild(information_li1);
 		data_infmation.appendChild(information_li2);
-		data_infmation.appendChild(information_li3);
 		data_infmation.appendChild(information_li5);
+		data_infmation.appendChild(information_li3);
+		data_infmation.appendChild(information_li4);
 		//tiwen_data
 		tiwen_data=document.createElement("div");
 		tiwen_data.id='tiwen_data';
 		
 		tiwen_li=document.createElement('li');
-		tiwen='tiwen'+cd;
+		// tiwen='tiwen';
 		//console.log(typeof (patient_list[i].patient_row_data.pop()))
 		//console.log(typeof(patient_list[i]))
 
@@ -65,10 +82,10 @@ function mycr(){
 		tiwen_span3.innerHTML='高温警报';
 
 		if (patient_list[i].patient_row_data.length === 0){
-			tiwen_li.innerHTML='体温：';
+			tiwen_li.innerHTML='';
 		}
 		else{
-			tiwen_li.innerHTML='体温：'+patient_list[i].patient_row_data[patient_list[i].patient_row_data.length-1];
+			tiwen_li.innerHTML=''+patient_list[i].patient_row_data[patient_list[i].patient_row_data.length-1]+'℃';
 			if(patient_list[i].patient_row_data[patient_list[i].patient_row_data.length-1]>38.0){
 				tiwen_span3.style.display='block';
 				tiwen_span2.style.display='none';
@@ -233,6 +250,7 @@ function mycr(){
 	);
 }
 function tubiao(item){
+	clearInterval(flag);
 	pid=item.nextElementSibling.firstChild.textContent
 	console.log(pid.substring(3,8))
 	pid=pid.substring(3,8);
@@ -382,141 +400,54 @@ function tubiao(item){
 			);
 		}
 	}
-
-	// document.getElementById('fangda_div').style.display='block';
-	// require.config({
-	//     paths: {
-	//         echarts: '..//js'
-	//     }
-	// });
-	// require(
-	//     [
-	//         'echarts',
-	//         'echarts/chart/line',
-	// 		'echarts/chart/bar',
-	// 		'echarts/theme/infographic',
-	// 		'echarts/theme/macarons',
-	//
-	//     ],
-	//     function (ec) {
-	// 		for(i=0;i<4;i++){
-	// 			cd=i.toString();
-	// 			//--- 折线图 ---
-	// 			var myChart2 = ec.init(document.getElementById('fangda'));
-	// 			// var myChart2 = ec.init(document.getElementById('fangda'+cd));
-	// 			myChart2.setOption({
-	// 				backgroundColor: '#c0c5b5',
-	// 				tooltip : {
-	// 					trigger: 'axis',
-	// 					axisPointer: {
-	// 						type: 'cross',
-	// 						label: {
-	// 							backgroundColor: '#ff0000'
-	// 						}
-	// 					}
-	// 				},
-	// 				legend: {
-	// 					data:['病人体温'],                        //标题
-	// 					backgroundColor: '#8b8b8b',
-	// 				},
-	// 				toolbox: {                              //工具箱
-	// 					show : true,
-	// 					feature : {
-	// 						dataZoom: {
-	// 						    yAxisIndex: 'none'
-	// 						},
-	// 						// mark : {show: true},
-	// 						dataView : {show: true, readOnly: false},
-	// 						magicType : {show: true, type: ['line', 'bar']},
-	// 						restore : {show: true},
-	// 						saveAsImage : {show: true}
-	// 					}
-	// 				},
-	// 				calculable : true,
-	// 				xAxis :
-	// 					{
-	// 						axisLabel:{
-	// 						    rotate: 60,
-	// 						    interval:0
-	// 						},
-	//
-	// 						type : 'category',
-	// 						// type:'time',
-	// 						data : row_list,
-	// 						name:'时间',
-	// 						boundaryGap: false,
-	// 						axisLine: {
-	// 						  //   lineStyle: {
-	// 								// color: 'red',
-	// 						  //   }
-	// 						},
-	// 					},
-	//
-	// 				yAxis : [
-	// 					{
-	// 						type : 'value',
-	// 						splitArea : {show : true},
-	// 						name:'体温',
-	// 						axisLabel: {
-	// 						    formatter: '{value} °C',
-	// 						},
-	// 						scale:true,
-	// 						max:45,
-	// 						min:30,
-	// 						splitNumber:20,
-	// 						// splitLine:{show:false}, //去除网状线 默认为true
-	//
-	// 					}
-	// 				],
-	// 				series : [
-	// 					{
-	// 						name:'体温',
-	// 						type:'line',
-	// 						// itemStyle:{
-	// 						//     normal:{ color: "#00aa00" } //坐标圆点的颜色
-	// 						// },
-	// 						lineStyle:{
-	// 							normal:{ width:1,color: "white",backgroundColor:'black'  }//线条的颜色及宽度
-	// 						},
-	// 						label: {//线条上的数字提示信息
-	// 							normal: {
-	// 								show: true,
-	// 								position: 'top'
-	// 							}
-	// 						},
-	// 						// smooth: true,//线条平滑
-	// 						data:time_list,
-	// 						markPoint: {
-	// 						    data: [
-	// 						        {type: 'max', name: '最大值'},
-	// 						        {type: 'min', name: '最小值'}
-	// 						    ]
-	// 						},
-	// 						markLine: {
-	// 						    data: [
-	// 						        {type: 'average', name: '平均值'}
-	// 						    ]
-	// 						}
-	//
-	// 					},
-	// 					// {
-	// 					//     name:'降水量',
-	// 					//     type:'line',
-	// 					//     data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]
-	// 					// }
-	//
-	// 				]
-	// 			});
-	//
-	//
-	// 		}
-	// 	window.onresize = function(){
-	// 		myChart2.resize();//使图表适应
-	// 	};
-	//     }
-	// );
-	
 }
 function fangda_cannl(){
+	flag=setInterval(time_out,122*1000);
 	document.getElementById('fangda_div').style.display='none';
+}
+function ajax_tiwen(){
+		// alert('ing')
+		$.ajax({
+			  url: "/polls/login/tiwen/ajax_tiwen/",
+			  method: "POST",
+			  data: {
+				  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+			  },
+			  success: function (data) {
+					// alert('体温数据获取成功！')
+					//
+					a=isJsonString(data)
+					console.log('a:',a);
+					data=data.split(',');
+				  	console.log(typeof (data));
+					console.log(data);
+			  },
+			  error:function () {undefined
+					alert("体温数据获取失败！！");
+			  }
+   		 })
+}
+function isJsonString(str) {
+						try {
+							if (typeof JSON.parse(str) == "object") {
+								return true;
+							}
+						} catch(e) {
+						}
+						return false;
+					}
+function device_status(){
+	$.ajax({
+			  url: "/polls/login/tiwen/device_status/",
+			  method: "get",
+			  data: {
+				  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+			  },
+			  success: function () {
+					console.log('device_status更新成功！');
+			  },
+			  error:function () {undefined
+					console.log('device_status更新失败！');
+			  }
+   		 })
 }

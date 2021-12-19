@@ -56,23 +56,23 @@ li{list-style: none;}
 }
 .data_infmation{
 	height: 40%;
-	width: 40%;
+	width: 50%;
 	float: left;
 	display: flex;
 	flex-direction: column;
 	/* border: 1px solid black; */
 }
 .data_infmation>li{
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
 	font-family: "宋体";
 	color: black;
 	padding-left: 10px;
-	padding-top: 7px;
+	padding-top: 4px;
 }
 #tiwen_data{
 	height: 40%;
-	width: 60%;
+	width: 50%;
 	float: left;
 	display: flex;
 	flex-direction: column;
@@ -108,7 +108,7 @@ li{list-style: none;}
 #fangda_div{
 	width: 1400px;
 	height: 600px;
-	position: absolute;
+	position: fixed;
 	background-color: #CCCCCC;
 	z-index: 25;
 	left: 65px;
