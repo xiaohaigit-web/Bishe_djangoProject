@@ -29,9 +29,10 @@
 			.title {
 				line-height: 58px;
 				margin-top: 20px;
-				font-size: 36px;
+				font-size: 50px;
 				color: #000;
 				height: 58px;
+				font-family:  fantasy;
 			}
 
 			#box:hover {

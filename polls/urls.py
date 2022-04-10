@@ -25,6 +25,8 @@ urlpatterns = [
     path('login/tiwen/ajax_tiwen/', views.ajax_tiwen, name='ajax_tiwen'),
     path('select/', views.select),
     path('login/tiwen/device_status/', views.device_status),
+    path('login/putout/', views.putout),
+    path('login_ajax/', views.login_ajax),
 
     # re_path(r'^login/', views.login, name="login"),
     # re_path(r'^login/regiter/', views.regiter, name="regiter"),

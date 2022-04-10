@@ -15,16 +15,44 @@ from lib.mypage import Pagination
 from django.db.models import Max
 
 
+# 登陆装饰器
+# def login_auth_session(func):
+#     def inner(request, *args, **kwargs):
+#         path = request.get_full_path()
+#         """
+#         检测用户当前路径,用于用户点击其他页面也需要用户登录
+#         """
+#         if request.session.get('name'):  # 这里使用request.session.get('xxx')判断用户到底是否登录
+#             return func(request, *args, **kwargs)
+#
+#         # 用户没有登录，其先前点击的路径将会拼接到登录页面的后面
+#         return redirect('/polls/login/?next=%s' % path)
+#
+#     return inner
+
+def login_auth_cookie(func):
+    def inner(request, *args, **kwargs):
+        path = request.get_full_path()
+        """
+        检测用户当前路径,用于用户点击其他页面也需要用户登录
+        """
+        print(request.COOKIES.get('key'))
+        if request.COOKIES.get('key'):  # 这里使用request.COOKIES.get判断用户到底是否登录
+            return func(request, *args, **kwargs)
+        else:
+            # 用户没有登录，其先前点击的路径将会拼接到登录页面的后面
+            return redirect('/polls/login/?next=%s' % path)
+
+    return inner
+
 # 登录页面
 def login(request):
-    # 指定要访问的页面，render的功能：讲请求的页面结果提交给客户端
-    return render(request, 'polls/login.html')
-
+    return render(request, 'polls/login.html', status=200)
 
 # 注册页面
+@login_auth_cookie
 def regiter(request):
     return render(request, 'polls/zhuche.html')
-
 
 # 定义一个函数，用来保存注册的数据
 @ensure_csrf_cookie
@@ -70,39 +98,64 @@ def save(request):
     else:
         return render(request, 'polls/zhanghaohaved.html', {'save_message': save_message})
 
-
 @ensure_csrf_cookie
 def query(request):
-    a = request.POST
-    username = a.get('username')
-    password = a.get('password')
-    user_tup = (username, password)
-    db = pymysql.connect(host='127.0.0.1',
-                         port=3306,
-                         user='root',
-                         password='210014',
-                         db='django')
-    cursor = db.cursor()
-    # sql = 'select * from polls_user'
-    sql = User.objects.all()
-    # cursor.execute(sql)
-    # all_users = cursor.fetchall()
-    all_users = sql
-    cursor.close()
-    db.close()
-    has_user = 0
-    for var in all_users:
-        print(var.username, type(var.username))
-        print(var.password, type(var.password))
-        if user_tup[0] == var.username and user_tup[1] == str(var.password):
-            has_user = 1
-    if has_user == 1:
-        # return render(request, 'polls/admin_patient.html')
-        return redirect('admin_patient')
-    else:
-        return HttpResponse(status=400)
+    # 指定要访问的页面，render的功能：讲请求的页面结果提交给客户端
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(username, password)
+        print(type(username), type(password))
+        user = User.objects.all()
+        for var in user:
+            print(var.username, var.password)
+            if var.username == username and str(var.password) == password:
+                next_ = request.GET.get('next')  # 获取用户/login/后面的路径
+                print(next_)
+                if next_:
+                    # 用户一旦登录跳转至用户之前打开位置的网址
+                    res = redirect(next_)
+                    res.set_cookie(key='key', value=username + ',' + password)
+                    request.session.set_expiry(0)
+                else:
+                    # 用户没有点击其他网页跳转会首页网页
+                    res = redirect('/polls/login/admin_patient/')
+                    res.set_cookie(key='key', value=username + ',' + password)
+                    request.session.set_expiry(0)
+                return res
+    # 用户密码有误或者不登录将一直在登陆页面
+    return HttpResponse(status=400)
 
+    # a = request.POST
+    # username = a.get('username')
+    # password = a.get('password')
+    # user_tup = (username, password)
+    # db = pymysql.connect(host='127.0.0.1',
+    #                      port=3306,
+    #                      user='root',
+    #                      password='210014',
+    #                      db='django')
+    # cursor = db.cursor()
+    # # sql = 'select * from polls_user'
+    # sql = User.objects.all()
+    # # cursor.execute(sql)
+    # # all_users = cursor.fetchall()
+    # all_users = sql
+    # cursor.close()
+    # db.close()
+    # has_user = 0
+    # for var in all_users:
+    #     print(var.username, type(var.username))
+    #     print(var.password, type(var.password))
+    #     if user_tup[0] == var.username and user_tup[1] == str(var.password):
+    #         has_user = 1
+    # if has_user == 1:
+    #     # return render(request, 'polls/admin_patient.html')
+    #     return redirect('admin_patient')
+    # else:
+    #     return HttpResponse(status=400)
 
+@login_auth_cookie
 def admin_device(request):
     patientid_all = Patient.objects.all()
     patient_device_all = Patient_Device.objects.all()
@@ -151,12 +204,15 @@ def admin_device(request):
             }
             device_list.append(json_dict)
     # print(device_list)
+    user = request.COOKIES['key']
+    user = user.split(',')
     return render(request, 'polls/admin_device.html', {'ret': device_list,
                                                        'page': page,
                                                        'patientid_list': patientid_list,
+                                                       'user': user,
                                                        })
 
-
+@login_auth_cookie
 def tiwen(request):
     global device_status
     global patient_device
@@ -180,9 +236,9 @@ def tiwen(request):
         else:
             device_status = 2
             # patient_device = '无设备'
-        if len(row) > 144:
-            row = row[len(row) - 144:]
-            rtime = rtime[len(rtime) - 144:]
+        if len(row) > 288:
+            row = row[len(row) - 288:]
+            rtime = rtime[len(rtime) - 288:]
         # print('row:', len(row), i.patient_id)
         # print('rtime:', len(rtime))
         patient_dirt = {
@@ -206,7 +262,7 @@ def tiwen(request):
         'patient_list': patient_list,
     })
 
-
+@login_auth_cookie
 def admin_patient(request):
     patient_device = Patient_Device.objects.all()
     json_list = []
@@ -240,23 +296,30 @@ def admin_patient(request):
             if i.patient_id == j.patient_id:
                 json_dict['bind_status'] = 1
         json_list.append(json_dict)
-
+    user = request.COOKIES['key']
+    user = user.split(',')
+    print(user[0])
     return render(request, 'polls/admin_patient.html', {
         'page': page,
         'ret': json_list,
+        'user': user,
     })
 
-
 # 添加病人页面
+@login_auth_cookie
 def add_patient(request):
-    return render(request, 'polls/add_patient.html')
+    user = request.COOKIES['key']
+    user = user.split(',')
+    return render(request, 'polls/add_patient.html', {'user': user, })
 
-
+@login_auth_cookie
 def add_device(request):
-    return render(request, 'polls/add_device.html')
-
+    user = request.COOKIES['key']
+    user = user.split(',')
+    return render(request, 'polls/add_device.html', {'user': user, })
 
 @ensure_csrf_cookie
+@login_auth_cookie
 def adddevice(request):
     has_id = 0
     add_request = request.POST
@@ -290,8 +353,8 @@ def adddevice(request):
     else:
         return HttpResponse(status=403)
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def addpatient(request):
     has_id = 0
     add_request = request.POST
@@ -334,8 +397,8 @@ def addpatient(request):
     else:
         return HttpResponse("id已存在")
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def edit(request):
     a = request.POST  # 获取post()请求
     edit_id = a.get('edit_id')
@@ -365,8 +428,8 @@ def edit(request):
     else:
         return HttpResponse(status=403)
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def bind(request):
     has_id = 0
     a = request.POST  # 获取post()请求
@@ -402,8 +465,8 @@ def bind(request):
     else:
         return HttpResponse(403)
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def release(request):
     a = request.POST  # 获取post()请求
     deviceid = a.get('patient_id')
@@ -411,8 +474,8 @@ def release(request):
     device_re.delete()
     return redirect('admin_device')
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def de_device(request):
     a = request.POST  # 获取post()请求
     deviceid = a.get('deviceid')
@@ -420,8 +483,8 @@ def de_device(request):
     device_de.delete()
     return HttpResponse(status=200)
 
-
 @ensure_csrf_cookie
+@login_auth_cookie
 def de_patient(request):
     a = request.POST  # 获取post()请求
     patient_id = a.get('patient_id')
@@ -429,7 +492,6 @@ def de_patient(request):
     patient_de = Patient.objects.get(patient_id=patient_id)
     patient_de.delete()
     return redirect('admin_patient')
-
 
 def save_row_data(request):
     add_request = request.POST
@@ -472,9 +534,7 @@ def save_row_data(request):
     else:
         return HttpResponse('the patient recordtime haved!')
 
-
 from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage, EmptyPage
-
 
 def select(request):
     # 1. 把需要分页的数据全部查询出来；
@@ -495,7 +555,6 @@ def select(request):
         page = paginator.page(1)
     print(type(page))
     return render(request, 'polls/admin_patient.html', {'page': page})
-
 
 def ajax_tiwen(request):
     row_list = []
@@ -528,6 +587,7 @@ def ajax_tiwen(request):
     return HttpResponse(row_list)
 
 
+@login_auth_cookie
 def device_status(request):
     all_patient = Patient.objects.all()
     for i in all_patient:
@@ -550,3 +610,63 @@ def device_status(request):
                 old_status.save()
             print(i.patient_id, old_status.device_status)
     return HttpResponse(status=200)
+
+
+def putout(request):
+    res = redirect('/polls/login/')
+    key = request.COOKIES['key']
+    print('key:', key)
+    res.delete_cookie('key')
+    return res
+
+
+def login_ajax(request):
+    # print(request.body,type(request.body))
+    # print(request.body.decode(),type(request.body.decode()))
+    # print(json.loads(request.body),type(json.loads(request.body)))
+    obj = json.loads(request.body)
+    username = obj.get('username')
+    password = obj.get('password')
+
+    muser = User.objects.all()
+    print(username, password)
+    for user in muser:
+        print(user.username, user.password)
+        if username == user.username:
+            print('_____')
+            if str(user.password) == password:
+                return_dirt = {
+                    'flag': 1,
+                    'msg': '登录成功！'
+                }
+                return_json = json.dumps(return_dirt)
+                return HttpResponse(return_json)
+            else:
+                return_dirt = {
+                    'flag': 2,
+                    'msg': '密码错误！'
+                }
+                return_json = json.dumps(return_dirt)
+                print(type(return_json))
+                return HttpResponse(return_json)
+    return_dirt = {
+        'flag': 0,
+        'msg': '用户不存在！'
+    }
+    return_json = json.dumps(return_dirt)
+    return HttpResponse(return_json)
+
+
+def old_ajax(request):
+    a = request.POST
+    username = a.get('username')
+    password = a.get('password')
+    try:
+        obj = User.objects.get(username=username)
+    except:
+        return HttpResponse(status=401)
+
+    if str(obj.password) == password:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=402)

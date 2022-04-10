@@ -1,3 +1,7 @@
+window.onload=function (){
+	userspan=document.getElementById('muser')
+	userspan.innerHTML=user[0];
+}
 function cannl() {
 	window.history.back(-1);
 }
@@ -75,4 +79,25 @@ function  save_patient(){
 		}
 		return true;
 		}
+}
+function putout(){
+	// alert('ssss')
+	var flag=confirm("是否确定登出？");
+	if(flag){
+		console.log('out')
+		$.ajax({
+			  url: "/polls/login/putout/",
+			  method: "POST",
+			  data: {
+				  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+			  },
+			  success: function () {
+					alert('登出成功！')
+				  window.location.href="http://127.0.0.1:8000/polls/login/";
+			  },
+			  error:function() {undefined
+					alert("登出错误！");
+			  }
+    	})
+	}
 }

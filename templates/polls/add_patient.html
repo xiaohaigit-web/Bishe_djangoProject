@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<title>add_patient</title>
+        <script>
+            user={{ user|safe }}
+        </script>
         {% load static %}
         <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
         <script text="JavaScript" src="/static/polls_js/add_patient.js"></script>
@@ -35,7 +38,7 @@
 			<div id="right_bigdiv">
 				<div id="right_topdiv">
 					<span class="span1">tubiao</span>
-					<span class="span2">xiao hai</span>
+					<span class="span2" id="muser" onmouseover="this.style.cursor = 'pointer';" onclick="putout()"></span>
 				</div>
 				<div id="right_meddiodiv">
 					<span id="span_patientlist">添加病人</span>

@@ -5,10 +5,9 @@
 		<title>admin</title>
         <script>
             var ret={{ ret|safe }};
-            {#var page={{ page|safe }}#}
             var patientid_list={{ patientid_list|safe }};
-            console.log(ret);
-            console.log(patientid_list);
+            var user={{ user|safe }}
+            console.log(user[0]);
         </script>
 		{% load static %}
         <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
@@ -62,7 +61,7 @@
 						</li>
 						
 						<li class="li_1" id="li_1-2">
-							<a class="a_1" id="a2" href="admin_device.html">设备管理</a>
+							<a class="a_1" id="a2" href="http://127.0.0.1:8000/polls/login/admin_device">设备管理</a>
 						</li>
 						<li class="li_1" id="li_1-3">
 							<a class="a_1" id="a3" href="http://127.0.0.1:8000/polls/login/tiwen/">体温监测</a>
@@ -72,8 +71,8 @@
 			</div>	
 			<div id="right_bigdiv">
 				<div id="right_topdiv">
-					<span class="span1">tubiao</span>
-					<span class="span2">xiao hai</span>
+					<span class="span1">欢迎登录！</span>
+					<span class="span2" id="muser" onmouseover="this.style.cursor = 'pointer';" onclick="putout()"></span>
 				</div>
 				<div id="right_meddiodiv">
 					<span id="span_patientlist">devices list</span>

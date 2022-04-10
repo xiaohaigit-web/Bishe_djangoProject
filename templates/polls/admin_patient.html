@@ -6,8 +6,9 @@
         <script>
             {#var page={{ page|safe}};#}
             var ret={{ ret|safe }};
-
+            var user={{ user|safe }}
             console.log(ret);
+            console.log((user[0]))
         </script>
         {% load static %}
         <script text="JavaScript" src="/static/polls_js/jquery-3.5.1.js"></script>
@@ -50,7 +51,7 @@
 				<div id="left_buttendiv">
 					<ul id="ul_2">
 						<li class="li_1" id="li_1-1">
-							<a class="a_1 "id="a1" href="admin_patient.html">病人管理</a>
+							<a class="a_1 "id="a1" href="http://127.0.0.1:8000/polls/login/admin_patient">病人管理</a>
 						</li>
 						<li class="li_1" id="li_1-2">
 							<a class="a_1" id="a2" href="http://127.0.0.1:8000/polls/login/admin_device/">设备管理</a>
@@ -63,8 +64,8 @@
 			</div>	
 			<div id="right_bigdiv">
 				<div id="right_topdiv">
-					<span class="span1">tubiao</span>
-					<span class="span2">xiao hai</span>
+					<span class="span1">欢迎登录！</span>
+					<span class="span2" id="muser" onmouseover="putout_mouseover(this)" onclick="putout()"></span>
 				</div>
 				<div id="right_meddiodiv">
 					<span id="span_patientlist">patient list</span>

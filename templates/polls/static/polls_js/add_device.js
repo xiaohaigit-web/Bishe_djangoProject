@@ -1,3 +1,8 @@
+window.onload=function (){
+	userspan=document.getElementById('muser')
+	userspan.innerHTML=user[0];
+}
+
 function cannl() {
 	window.history.back(-1);
 }

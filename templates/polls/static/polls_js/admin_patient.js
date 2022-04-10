@@ -1,5 +1,7 @@
 window.onload=mycreat;
 function mycreat(){
+	userspan=document.getElementById('muser')
+	userspan.innerHTML=user[0];
 	//console.log(typeof ret)
 	for (i=0;i<ret.length;i++){
 		console.log(ret[i].patient_id);
@@ -192,4 +194,28 @@ function de_patient(){
 }
 function delete_cannl(){
 	document.getElementById("delete_patient").style.display='none';
+}
+function putout_mouseover(item){
+	item.style.cursor = 'pointer';
+}
+function putout(){
+	// alert('ssss')
+	var flag=confirm("是否确定登出？");
+	if(flag){
+		console.log('out')
+		$.ajax({
+			  url: "/polls/login/putout/",
+			  method: "POST",
+			  data: {
+				  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()  // 使用jQuery取出csrfmiddlewaretoken的值，拼接到data中
+			  },
+			  success: function () {
+					alert('登出成功！')
+				  window.location.href="http://127.0.0.1:8000/polls/login/";
+			  },
+			  error:function() {undefined
+					alert("登出错误！");
+			  }
+    	})
+	}
 }
